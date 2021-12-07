@@ -34,17 +34,18 @@ use PhillAll\SimpleCaptcha\Cookie;
 Class Token
 {
     /**
-     * string to use to generate token
+     * Given string, used to generate token or verify user captcha
      *
      * @var string $string
      */
     private $string;
+    
     /**
-     * Sets string to use to generate token
+     * Sets string to use to generate token.
      *
-     *@param string $string string to be encrypt to generate token
+     * @param string $string string to be encrypt to generate token
      */
-    public function __construct($string)
+    public function __construct(string $string)
     {
         $this->string = $string;
 
@@ -56,7 +57,7 @@ Class Token
      *
      * @return string
      */
-    public function encrypt(): string
+    private function encrypt(): string
     {
         return password_hash(strrev($this->string), PASSWORD_DEFAULT);
     }
@@ -64,25 +65,26 @@ Class Token
     /**
      * Stores token in a cookie.
      *
-     * @param string $string SimpleCaptcha
-     *
      * @return void
      */
     public function store(): void
     {
-        $store = (new Cookie)->setCOOKIE('SCWT', $this->encrypt());
+        (new Cookie)->setCOOKIE('SCWT', $this->encrypt());
     }
 
     /**
      * Checks if a given string matches string use to generate SCWT token.
      *
-     * @param string $given
-     * @param string $cookie
-     *
      * @return boolean
      */
-    public function compare(string $given, string $cookie): bool
+    public function compare(): bool
     {
-        return password_verify(strrev($given), (new Cookie)->getCOOKIE('SCWT'));
+        $cookie = (new Cookie)->getCOOKIE('SCWT');
+
+        if ($cookie != null) {
+            return password_verify(strrev($this->string), $cookie);
+        }
+
+        return false;
     }
 }
