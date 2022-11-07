@@ -6,6 +6,4 @@ A PHP library for captcha generation and display
 
 Under development...
 
-[version 1 started from](./doc/Working_principle.md).
-
-[version 2 refactoring](./doc/Refactoring.md).
+Project is moved on gitlab: [https://gitlab.com/phil-all/philall-simple-captcha](https://gitlab.com/phil-all/philall-simple-captcha)
