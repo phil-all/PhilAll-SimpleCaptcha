@@ -1,0 +1,58 @@
+@startuml sequence-diagram
+
+skinparam sequenceMessageAlign center
+
+participant App
+participant Provider #TECHNOLOGY
+participant Validator #TECHNOLOGY
+participant Randomizer #Pink
+participant CookieHandler #Pink
+participant Encoder #Pink
+participant UriGenerator #Pink
+participant Picture #Pink
+
+== Generate Captcha ==
+
+    App -[#blue]> Provider : getCaptcha( $settings )
+    activate Provider
+
+    Provider -[#blue]> Randomizer : getPhrase( $settings )
+    activate Randomizer
+    Randomizer -[#brown]> Provider : $phrase
+    deactivate Randomizer
+
+    Provider -[#blue]> CookieHandler : setCookie( $phrase )
+    activate CookieHandler
+    CookieHandler -[#blue]> Encoder : getEncrypt( $phrase )
+    activate Encoder
+    Encoder -[#brown]> CookieHandler : $encrypt
+    deactivate Encoder
+    CookieHandler -[#blue]> CookieHandler : storeCookie()
+    CookieHandler -[#white]> CookieHandler
+    deactivate CookieHandler
+
+    Provider -[#blue]> UriGenerator : getDataUriScheme( $phrase, $settings )
+    activate UriGenerator
+    UriGenerator -[#blue]> Picture : create( $phrase, $settings )
+    activate Picture
+    UriGenerator -[#blue]> Picture : getBase64Code()
+    Picture -[#brown]> UriGenerator : $pictureCode
+    deactivate Picture
+    UriGenerator -[#brown]> Provider : $dataUriScheme
+    deactivate UriGenerator
+    Provider -[#brown]> App : $dataUriScheme
+    deactivate Provider
+
+== Captcha validation ==
+
+    App -[#blue]> Validator : isCaptchaValid( $userInput )
+    activate Validator
+    Validator -[#blue]> CookieHandler : getCookie()
+    activate CookieHandler
+    CookieHandler -[#blue]> Validator : $cookie
+    deactivate CookieHandler
+    Validator -[#blue]> Validator : inputChecker( $userInput, $cookie )
+    Validator -[#brown]> App : return $bool
+    deactivate Validator
+
+@enduml
